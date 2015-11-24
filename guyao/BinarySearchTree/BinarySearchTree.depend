@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1447421071 source:f:\data structure\binarysearchtree\test.cpp
+	<iostream>
+	"BST.h"
+
+1447413949 f:\data structure\binarysearchtree\bst.h
+	<iostream>
+
