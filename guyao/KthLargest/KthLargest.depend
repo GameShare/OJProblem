@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1449318650 source:f:\data structure\kthlargest\test.cpp
+	<iostream>
+	"kThFinder.h"
+
+1449318914 f:\data structure\kthlargest\kthfinder.h
+	<iostream>
+
