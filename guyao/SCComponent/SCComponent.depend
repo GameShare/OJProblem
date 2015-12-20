@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1450363834 source:f:\data structure\sccomponent\test.cpp
+	<iostream>
+	"SCCGraph.h"
+
+1450364751 f:\data structure\sccomponent\sccgraph.h
+	<iostream>
+
