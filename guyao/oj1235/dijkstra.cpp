@@ -62,6 +62,141 @@ class myQueue
     };
 };
 
+class minHeap
+{
+  private:
+    int *data;
+    int *start;
+    int *pointer;
+    int maxSize;
+
+    void mySwap(int &a,int &b)
+    {
+      int temp;
+      temp=a;
+      a=b;
+      b=temp;
+    };
+
+    void siftdown(int posi)
+    {
+      int lchild;
+      int rchild;
+      while(true)
+      {
+        lchild=posi*2+1;
+        rchild=posi*2+2;
+        if(rchild<maxSize)
+        {
+          if(data[lchild]<data[rchild])
+          {
+            if(data[posi]>data[lchild])
+            {
+              mySwap(data[posi],data[lchild]);
+              mySwap(start[posi],start[lchild]);
+              pointer[start[posi]]=posi;
+              pointer[start[lchild]]=lchild;
+              posi=lchild;
+            }
+            else return;
+          }
+          else
+          {
+            if(data[posi]>data[rchild])
+            {
+              mySwap(data[posi],data[rchild]);
+              mySwap(start[posi],start[rchild]);
+              pointer[start[posi]]=posi;
+              pointer[start[rchild]]=rchild;
+              posi=rchild;
+            }
+            else return;
+          }
+        }
+        else if(lchild>=maxSize) return;
+        else
+        {
+          if(data[posi]>data[lchild])
+          {
+            mySwap(data[posi],data[lchild]);
+            mySwap(start[posi],start[lchild]);
+            pointer[start[posi]]=posi;
+            pointer[start[lchild]]=lchild;
+            posi=lchild;
+          }
+          else return;
+        }
+      }
+    };
+
+    void upHeap(int posi)
+    {
+      int parent;
+      while(true)
+      {
+        if(posi==0) return;
+        parent=(posi-1)/2;
+        if(data[posi]<data[parent])
+        {
+          mySwap(data[posi],data[parent]);
+          mySwap(start[posi],start[parent]);
+          pointer[start[posi]]=posi;
+          pointer[start[parent]]=parent;
+          posi=parent;
+        }
+        else return;
+      }
+    };
+
+  public:
+    minHeap(int n,int *newdata)
+    {
+      maxSize=n;
+      pointer=new int [n];
+      start=new int [n];
+      data=newdata;
+      for(int i=0;i<n;i++) {pointer[i]=i;start[i]=i;}
+      for(int i=n/2-1;i>=0;i--)
+      {
+        siftdown(i);
+      }
+    };
+
+    int deQueue(int &nowDis)
+    {
+      int temp=start[0];
+      nowDis=data[0];
+      mySwap(data[0],data[maxSize-1]);
+      mySwap(start[0],start[maxSize-1]);
+      pointer[start[0]]=0;
+      pointer[start[maxSize-1]]=maxSize-1;
+      maxSize--;
+      siftdown(0);
+      return temp;
+    };
+
+    void changeW(int posi,int newW)
+    {
+      int temp=pointer[posi];
+      data[temp]=newW;
+      upHeap(temp);
+      siftdown(temp);
+    };
+
+    int getDis(int posi)
+    {
+      return data[pointer[posi]];
+    };
+
+    ~minHeap()
+    {
+      delete [] pointer;
+      delete [] data;
+      delete [] start;
+    };
+
+};
+
 
 
 class myGraph
@@ -70,6 +205,19 @@ class myGraph
         myNode **vertex;
         int *marks;
         int vnum;
+        void printPre(int ed,int *prev)
+        {
+          if(prev[ed]>=0)
+          {
+            printPre(prev[ed],prev);
+            cout<<ed+1<<' ';
+          }
+          else
+          {
+            cout<<ed+1<<' ';
+          }
+
+        };
 
     public:
         myGraph(int n)
@@ -96,41 +244,65 @@ class myGraph
           }
         };
 
-        void
 
 
 
         void dijkstra(int start,int ed)
         {
           int *distance=new int [vnum];
+          int *known=new int [vnum];
+          int *prev=new int [vnum];
+          int ct=vnum;
           int temp;
           for(int i=0;i<vnum;i++)
           {
             distance[i]=2147483647;
+            known[i]=-2147483647;
+            prev[i]=start;
           }
           distance[start]=0;
-          myQueue q(vnum+100);
-          q.enQueue(start);
+          known[start]=-1;
+          prev[start]=-1;
+          minHeap h(vnum,distance);
           myNode *nowPosi;
-          while(!q.isEmpty())
+          int nowDis;
+          while(ct>=1)
           {
-            temp=q.deQueue();
+            temp=h.deQueue(nowDis);
             nowPosi=vertex[temp];
+            known[temp]=-known[temp];
+            ct--;
             while(nowPosi)
             {
-              if(distance[temp]!=2147483647)
+              if(known[nowPosi->data]<0)
               {
-                if(distance[nowPosi->data]>distance[temp]+nowPosi->weight)
+                if(nowDis!=2147483647)
                 {
-                  q.enQueue(nowPosi->data);
-                  distance[nowPosi->data]=distance[temp]+nowPosi->weight;
+                  if(h.getDis(nowPosi->data)>nowDis+nowPosi->weight)
+                  {
+                    known[nowPosi->data]=-(known[temp]+1);
+                    h.changeW(nowPosi->data,nowDis+nowPosi->weight);
+                    prev[nowPosi->data]=temp;
+                  }
+                  else if(h.getDis(nowPosi->data)==nowDis+nowPosi->weight)
+                  {
+                    if(known[nowPosi->data]<-(known[temp]+1))
+                    {
+                      known[nowPosi->data]=-(known[temp]+1);
+                      h.changeW(nowPosi->data,nowDis+nowPosi->weight);
+                      prev[nowPosi->data]=temp;
+                    }
+                  }
                 }
               }
               nowPosi=nowPosi->next;
             }
           }
-          cout<<distance[ed]<<endl;
-          delete [] distance;
+          cout<<h.getDis(ed)<<endl;
+          printPre(ed,prev);
+          cout<<endl;
+          delete [] prev;
+          delete [] known;
         };
 
 
@@ -167,6 +339,7 @@ int main()
     cin>>a>>b>>w;
     g.addEdge(a-1,b-1,w);
   }
+  g.dijkstra(start-1,ed-1);
 
   return 0;
 }
