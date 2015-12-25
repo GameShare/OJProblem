@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1449979733 source:f:\data structure\adjacencymatrix\test.cpp
+	<iostream>
+	"AMGraph.h"
+
+1449979940 f:\data structure\adjacencymatrix\amgraph.h
+	<iostream>
+
